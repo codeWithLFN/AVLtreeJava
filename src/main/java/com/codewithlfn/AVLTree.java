@@ -54,7 +54,7 @@ public class AVLTree {
 
         if (key < root.key) {
             root.left = insert(root.left, key);
-        }else if (key > root.key) {
+        } else if (key > root.key) {
             root.right = insert(root.right, key);
         } else {
             return root; // Duplicate keys are not allowed
@@ -84,13 +84,13 @@ public class AVLTree {
         }
         return current;
     }
-    
+
     // Delete method
     AVLNode delete(AVLNode node, int key) {
         if (node == null) {
             return null;
         }
-        
+
         if (key < node.key) {
             node.left = delete(node.left, key);
         } else if (key > node.key) {
@@ -135,14 +135,6 @@ public class AVLTree {
         }
 
         return node;
-    }
-
-    void preOrder(AVLNode node) {
-        if (node != null) {
-            System.out.print(node.key + " ");
-            preOrder(node.left);
-            preOrder(node.right);
-        }
     }
 
     // Method to visually print the tree using standard ASCII characters
