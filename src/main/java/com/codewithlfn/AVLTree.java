@@ -35,11 +35,13 @@ public class AVLTree {
     // Left rotation for a right-right case
     AVLNode rotateLeft(AVLNode x) {
         AVLNode y = x.right;
-        AVLNode t2 = y.left;
+        AVLNode subtree = y.left;
 
+        // Perform the left rotation
         y.left = x;
-        x.right = t2;
+        x.right = subtree;
 
+        // Update heights of the nodes
         x.height = Math.max(height(x.left), height(x.right)) + 1;
         y.height = Math.max(height(y.left), height(y.right)) + 1;
 
@@ -60,6 +62,7 @@ public class AVLTree {
             return root; // Duplicate keys are not allowed
         }
 
+        // Update height of the current node
         root.height = 1 + Math.max(height(root.left), height(root.right));
 
         int balance = getBalanceFactor(root);
@@ -118,6 +121,7 @@ public class AVLTree {
             return node;
         }
 
+        // Update height of the current node
         node.height = 1 + Math.max(height(node.left), height(node.right));
 
         int balance = getBalanceFactor(node);

@@ -8,6 +8,6 @@ public class AVLNode {
 
     public AVLNode(int key) {
         this.key = key;
-        this.height = 1; // New nodes are initially added at leaf position
+        this.height = 1; // New nodes are initially added at the leaf position
     }
 }
