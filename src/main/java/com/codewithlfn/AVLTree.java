@@ -21,10 +21,10 @@ public class AVLTree {
     // Right rotation for a left-left case
     AVLNode rotateRight(AVLNode y) {
         AVLNode x = y.left;
-        AVLNode t2 = x.right;
+        AVLNode subtree = x.right;
 
         x.right = y;
-        y.left = t2;
+        y.left = subtree;
 
         y.height = Math.max(height(y.left), height(y.right)) + 1;
         x.height = Math.max(height(x.left), height(x.right)) + 1;
