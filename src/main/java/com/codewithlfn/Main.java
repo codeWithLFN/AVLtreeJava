@@ -7,23 +7,23 @@ public class Main {
 
         // lets add some courses to the system
         System.out.println("--- Registering Courses ---");
-        tree.insert(1012);
-        tree.insert(2045);
-        tree.insert(3078);
-        tree.insert(1055);
-        tree.insert(4090);
+        tree.insert(20);
+        tree.insert(10);
+        tree.insert(30);
+        tree.insert(5);
+        tree.insert(25);
         System.out.println("done, all courses have been added.\n");
 
-        // show what we have so far in order
+        // show sorted list
         System.out.print("courses currently in the system: ");
         tree.printInOrder();
         System.out.println("\n");
 
         // now lets remove one and see what happens
-        System.out.println("--- removing course 2045 from the system ---");
-        tree.delete(2045);
+        System.out.println("--- removing course 10 from the system ---");
+        tree.delete(10);
 
-        // print again to confirm it was removed
+        // confirm what is still registered
         System.out.print("courses still registered: ");
         tree.printInOrder();
         System.out.println();

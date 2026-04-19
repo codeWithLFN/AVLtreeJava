@@ -140,7 +140,7 @@ public class AVLTree {
     private void printInOrder(AVLNode node) {
         if (node != null) {
             printInOrder(node.leftChild);
-            System.out.print("Course " + node.courseCode + "  ");
+            System.out.print(node.courseCode + "  ");
             printInOrder(node.rightChild);
         }
     }
