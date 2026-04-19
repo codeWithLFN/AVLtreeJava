@@ -1,13 +1,12 @@
 package com.codewithlfn;
 
 public class AVLNode {
-    int key;
-    AVLNode left;
-    AVLNode right;
-    int height;
+    int courseCode;
+    int nodeHeight;
+    AVLNode leftChild, rightChild;
 
-    public AVLNode(int key) {
-        this.key = key;
-        this.height = 1; // New nodes are initially added at the leaf position
+    public AVLNode(int courseCode) {
+        this.courseCode = courseCode;
+        this.nodeHeight = 1; // New nodes start at height 1
     }
 }

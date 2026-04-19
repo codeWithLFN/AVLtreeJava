@@ -1,154 +1,147 @@
 package com.codewithlfn;
 
 public class AVLTree {
-    AVLNode root;
+    AVLNode treeRoot;
 
-    // Helper function to get the height of a node
-    int height(AVLNode node) {
-        if (node == null) {
-            return 0;
-        }
-        return node.height;
+    // how tall is this node
+    private int getHeight(AVLNode node) {
+        return node == null ? 0 : node.nodeHeight;
     }
 
-    int getBalanceFactor(AVLNode node) {
-        if (node == null) {
-            return 0;
-        }
-        return height(node.left) - height(node.right);
+    // is the tree leaning more to the left or right
+    private int getBalance(AVLNode node) {
+        return node == null ? 0 : getHeight(node.leftChild) - getHeight(node.rightChild);
     }
 
-    // Right rotation for a left-left case
-    AVLNode rotateRight(AVLNode y) {
-        AVLNode x = y.left;
-        AVLNode subtree = x.right;
+    // update the height after we make changes
+    private void updateHeight(AVLNode node) {
+        node.nodeHeight = 1 + Math.max(getHeight(node.leftChild), getHeight(node.rightChild));
+    }
 
-        x.right = y;
-        y.left = subtree;
-
-        y.height = Math.max(height(y.left), height(y.right)) + 1;
-        x.height = Math.max(height(x.left), height(x.right)) + 1;
-
+    // the tree is too heavy on the left so we tip it to the right
+    private AVLNode rotateRight(AVLNode y) {
+        AVLNode x = y.leftChild;
+        AVLNode temp = x.rightChild;
+        x.rightChild = y;
+        y.leftChild = temp;
+        updateHeight(y);
+        updateHeight(x);
         return x;
     }
 
-    // Left rotation for a right-right case
-    AVLNode rotateLeft(AVLNode x) {
-        AVLNode y = x.right;
-        AVLNode subtree = y.left;
-
-        // Perform the left rotation
-        y.left = x;
-        x.right = subtree;
-
-        // Update heights of the nodes
-        x.height = Math.max(height(x.left), height(x.right)) + 1;
-        y.height = Math.max(height(y.left), height(y.right)) + 1;
-
+    // the tree is too heavy on the right so we tip it to the left
+    private AVLNode rotateLeft(AVLNode x) {
+        AVLNode y = x.rightChild;
+        AVLNode temp = y.leftChild;
+        y.leftChild = x;
+        x.rightChild = temp;
+        updateHeight(x);
+        updateHeight(y);
         return y;
     }
 
-    // Insert method
-    AVLNode insert(AVLNode root, int key) {
-        if (root == null) {
-            return new AVLNode(key);
+    // after adding or removing a course we check if anything is off balance
+    private AVLNode rebalance(AVLNode node, int courseCode) {
+        updateHeight(node);
+        int balance = getBalance(node);
+
+        // too many nodes stacking on the left side
+        if (balance > 1 && courseCode < node.leftChild.courseCode) {
+            return rotateRight(node);
         }
 
-        if (key < root.key) {
-            root.left = insert(root.left, key);
-        } else if (key > root.key) {
-            root.right = insert(root.right, key);
+        // too many nodes stacking on the right side
+        if (balance < -1 && courseCode > node.rightChild.courseCode) {
+            return rotateLeft(node);
+        }
+
+        // left side has a node that belongs more to the right
+        if (balance > 1 && courseCode > node.leftChild.courseCode) {
+            node.leftChild = rotateLeft(node.leftChild);
+            return rotateRight(node);
+        }
+
+        // right side has a node that belongs more to the left
+        if (balance < -1 && courseCode < node.rightChild.courseCode) {
+            node.rightChild = rotateRight(node.rightChild);
+            return rotateLeft(node);
+        }
+
+        // tree looks fine, nothing to do
+        return node;
+    }
+
+    // registers a new course into the system
+    public void insert(int courseCode) {
+        treeRoot = insertNode(treeRoot, courseCode);
+    }
+
+    private AVLNode insertNode(AVLNode node, int courseCode) {
+        if (node == null) {
+            return new AVLNode(courseCode);
+        }
+
+        if (courseCode < node.courseCode) {
+            node.leftChild = insertNode(node.leftChild, courseCode);
+        } else if (courseCode > node.courseCode) {
+            node.rightChild = insertNode(node.rightChild, courseCode);
         } else {
-            return root; // Duplicate keys are not allowed
+            return node; // this course is already in the system
         }
 
-        // Update height of the current node
-        root.height = 1 + Math.max(height(root.left), height(root.right));
-
-        int balance = getBalanceFactor(root);
-        if (balance > 1 && key < root.left.key) {
-            return rotateRight(root);
-        } else if (balance < -1 && key > root.right.key) {
-            return rotateLeft(root);
-        } else if (balance > 1 && key > root.left.key) {
-            root.left = rotateLeft(root.left);
-            return rotateRight(root);
-        } else if (balance < -1 && key < root.right.key) {
-            root.right = rotateRight(root.right);
-            return rotateLeft(root);
-        }
-        return root;
+        return rebalance(node, courseCode);
     }
 
-    AVLNode minValueNode(AVLNode node) {
-        AVLNode current = node;
-        while (current.left != null) {
-            current = current.left;
-        }
-        return current;
+    // drops a course from the system
+    public void delete(int courseCode) {
+        treeRoot = deleteNode(treeRoot, courseCode);
     }
 
-    // Delete method
-    AVLNode delete(AVLNode node, int key) {
+    private AVLNode deleteNode(AVLNode node, int courseCode) {
         if (node == null) {
             return null;
         }
 
-        if (key < node.key) {
-            node.left = delete(node.left, key);
-        } else if (key > node.key) {
-            node.right = delete(node.right, key);
+        if (courseCode < node.courseCode) {
+            node.leftChild = deleteNode(node.leftChild, courseCode);
+        } else if (courseCode > node.courseCode) {
+            node.rightChild = deleteNode(node.rightChild, courseCode);
         } else {
-            // Node with only one child or no child
-            if ((node.left == null) || (node.right == null)) {
-                AVLNode temp;
-                if (node.left == null) {
-                    temp = node.right;
-                } else {
-                    temp = node.left;
-                }
-                node = null;
-                return temp;
-            } else {
-                // Node with two children
-                AVLNode temp = minValueNode(node.right);
-                node.key = temp.key;
-                node.right = delete(node.right, temp.key);
+            // we found the course, now remove it
+            if (node.leftChild == null) {
+                return node.rightChild;
             }
+            if (node.rightChild == null) {
+                return node.leftChild;
+            }
+
+            // node has two children so we swap it with the next one in line
+            AVLNode smallest = getSmallestNode(node.rightChild);
+            node.courseCode = smallest.courseCode;
+            node.rightChild = deleteNode(node.rightChild, smallest.courseCode);
         }
 
-        if (node == null) {
-            return node;
+        return rebalance(node, courseCode);
+    }
+
+    // keep going left until we hit the smallest value
+    private AVLNode getSmallestNode(AVLNode node) {
+        while (node.leftChild != null) {
+            node = node.leftChild;
         }
-
-        // Update height of the current node
-        node.height = 1 + Math.max(height(node.left), height(node.right));
-
-        int balance = getBalanceFactor(node);
-
-        if (balance > 1 && getBalanceFactor(node.left) >= 0) {
-            return rotateRight(node);
-        } else if (balance < -1 && getBalanceFactor(node.right) <= 0) {
-            return rotateLeft(node);
-        } else if (balance > 1 && getBalanceFactor(node.left) < 0) {
-            node.left = rotateLeft(node.left);
-            return rotateRight(node);
-        } else if (balance < -1 && getBalanceFactor(node.right) > 0) {
-            node.right = rotateRight(node.right);
-            return rotateLeft(node);
-        }
-
         return node;
     }
 
-    // Method to visually print the tree using standard ASCII characters
-    void printTree(AVLNode node, String prefix, boolean isLeft) {
-        if (node != null) {
-            System.out.println(prefix + (isLeft ? "+-- " : "\\-- ") + node.key);
+    // prints all courses from smallest to largest
+    public void printInOrder() {
+        printInOrder(treeRoot);
+    }
 
-            // Recursively print left and right children
-            printTree(node.left, prefix + (isLeft ? "|   " : "    "), true);
-            printTree(node.right, prefix + (isLeft ? "|   " : "    "), false);
+    private void printInOrder(AVLNode node) {
+        if (node != null) {
+            printInOrder(node.leftChild);
+            System.out.print("Course " + node.courseCode + "  ");
+            printInOrder(node.rightChild);
         }
     }
 }
